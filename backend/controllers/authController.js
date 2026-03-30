@@ -2,42 +2,55 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// REGISTER
 // exports.register = async (req, res) => {
 //   const { name, email, password, role, phoneno } = req.body;
 
 //   try {
 //     console.log(req.body);
+
 //     const hash = await bcrypt.hash(password, 10);
 
 //     const sql =
-//       "INSERT INTO users (name,email,password,role, phone) VALUES (?,?,?,?,?)";
+//       "INSERT INTO users (name,email,password,role,phone) VALUES (?,?,?,?,?)";
 
-//     db.query(
-//       sql,
-//       [name, email, hash, role || "user", phoneno],
-//       (err, result) => {
-        
-//         if (err) {
-//           return res.status(500).json(err);
-//         }
+//     const [result] = await db.execute(sql, [
+//       name,
+//       email,
+//       hash,
+//       role || "user",
+//       phoneno,
+//     ]);
 
-//         res.json({
-//           success:true,
-//           message: "User registered successfully",
+//     return res.status(201).json({
+//       success: true,
+//       message: "User registered successfully",
+//       userId: result.insertId,
+//     });
 
-//         });
-//       },
-//     );
 //   } catch (error) {
-//     res.status(500).json(error);
+//     console.error(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//       error: error.message,
+//     });
 //   }
 // };
+
+// LOGIN
 exports.register = async (req, res) => {
-  const { name, email, password, role, phoneno } = req.body;
+  const { name, email, password, role, phone } = req.body;
 
   try {
     console.log(req.body);
+
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
 
     const hash = await bcrypt.hash(password, 10);
 
@@ -49,7 +62,7 @@ exports.register = async (req, res) => {
       email,
       hash,
       role || "user",
-      phoneno,
+      phone,
     ]);
 
     return res.status(201).json({
@@ -68,8 +81,6 @@ exports.register = async (req, res) => {
     });
   }
 };
-
-// LOGIN
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
